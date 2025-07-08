@@ -1,6 +1,6 @@
 // src/config.js
-const dotenv = require("dotenv");
-const path = require("path");
+import dotenv from "dotenv";
+import path from "path";
 
 // 환경 변수로 어떤 설정 파일을 사용할지 결정
 const ENV = process.env.NODE_ENV || "local";
@@ -33,7 +33,7 @@ const config = {
   restrictions: {
     local: {
       readOnly: false,
-      allowedOperations: ["SELECT", "INSERT", "UPDATE", "DELETE"],
+      allowedOperations: ["SELECT", "INSERT", "UPDATE", "DELETE", "SHOW"],
     },
     test: {
       readOnly: false,
@@ -51,4 +51,4 @@ if (ENV === "production") {
   throw new Error("🚫 프로덕션 DB 접근은 보안상 차단되어 있습니다!");
 }
 
-module.exports = config;
+export default config;
