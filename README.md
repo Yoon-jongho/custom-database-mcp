@@ -95,4 +95,4 @@ console.log(queryResponse.content[0].text);
 
 ## 📄 라이선스
 
-이 프로젝트의 모든 권한은 [귀하의 이름 또는 회사명]에게 있습니다.
+이 프로젝트는 [MIT License](LICENSE) 하에 라이선스됩니다.
