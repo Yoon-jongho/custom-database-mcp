@@ -3,36 +3,41 @@
 ## 📋 시스템 요구사항
 
 ### 필수 요구사항
+
 - **Node.js**: v18.0.0 이상 (LTS 권장)
 - **npm**: v8.0.0 이상 또는 **yarn**: v1.22.0 이상
 - **Git**: 코드 다운로드 및 버전 관리용
 
 ### 지원하는 데이터베이스
+
 - **MySQL**: v5.7 이상
-- **MariaDB**: v10.3 이상  
+- **MariaDB**: v10.3 이상
 - **PostgreSQL**: v12 이상
 
 ## 🚀 설치 과정
 
 ### 1단계: 저장소 클론
+
 ```bash
 # GitHub에서 클론 (추후 배포 후)
-git clone https://github.com/your-username/database-mcp.git
-cd database-mcp
+git clone https://github.com/Yoon-jongho/custom-database-mcp.git
+cd custom-database-mcp
 
 # 또는 ZIP 다운로드 후 압축 해제
 ```
 
 ### 2단계: 의존성 설치
+
 ```bash
 # npm 사용시
 npm install
 
-# yarn 사용시  
+# yarn 사용시
 yarn install
 ```
 
 ### 3단계: 환경 설정 파일 생성
+
 ```bash
 # 예제 파일을 복사하여 환경 설정 파일 생성
 cp .env.example .env.local
@@ -42,6 +47,7 @@ touch .env.local
 ```
 
 ### 4단계: 환경 설정 편집
+
 `.env.local` 파일을 열어서 데이터베이스 정보를 입력합니다.
 
 ```bash
@@ -54,6 +60,7 @@ nano .env.local
 ```
 
 ### 5단계: 연결 테스트
+
 ```bash
 # 테스트 클라이언트 실행
 node test-client.js
@@ -67,12 +74,15 @@ npm start
 ### 성공적인 설치 확인 방법
 
 1. **의존성 설치 확인**
+
    ```bash
    npm list --depth=0
    ```
+
    필수 패키지들이 모두 설치되었는지 확인
 
 2. **환경 설정 확인**
+
    ```bash
    node -e "import config from './src/config.js'; console.log('DB 개수:', config.databases.size)"
    ```
@@ -84,6 +94,7 @@ npm start
    모든 설정된 DB에 연결이 성공해야 함
 
 ### 예상 출력 결과
+
 ```
 Database MCP server started
 ✅ 클라이언트가 서버에 연결되었습니다.
@@ -94,6 +105,7 @@ Database MCP server started
 ## 🔧 개발 환경 설정 (선택사항)
 
 ### 개발 도구 설치
+
 ```bash
 # nodemon (자동 재시작)
 npm install -g nodemon
@@ -103,7 +115,9 @@ npm install --save-dev nodemon
 ```
 
 ### 개발 스크립트 추가
+
 `package.json`에 개발용 스크립트 추가:
+
 ```json
 {
   "scripts": {
@@ -114,7 +128,9 @@ npm install --save-dev nodemon
 ```
 
 ### VS Code 설정 (추천)
+
 `.vscode/settings.json` 파일 생성:
+
 ```json
 {
   "editor.formatOnSave": true,
@@ -126,9 +142,10 @@ npm install --save-dev nodemon
 ## 🐳 Docker 환경에서 설치
 
 ### Docker Compose 사용
+
 ```yaml
 # docker-compose.yml 예시
-version: '3.8'
+version: "3.8"
 services:
   database-mcp:
     build: .
@@ -141,7 +158,7 @@ services:
     depends_on:
       - mysql
       - postgres
-      
+
   mysql:
     image: mariadb:10.11
     environment:
@@ -149,7 +166,7 @@ services:
       MYSQL_DATABASE: testdb
     ports:
       - "3306:3306"
-      
+
   postgres:
     image: postgres:14-alpine
     environment:
@@ -163,6 +180,7 @@ services:
 ## ❌ 일반적인 설치 오류
 
 ### Node.js 버전 오류
+
 ```bash
 # 오류: Node.js 버전이 낮음
 Error: Requires Node.js v18.0.0 or higher
@@ -173,6 +191,7 @@ nvm use --lts
 ```
 
 ### 권한 오류 (macOS/Linux)
+
 ```bash
 # 오류: npm 권한 문제
 Error: EACCES: permission denied
@@ -182,6 +201,7 @@ sudo chown -R $(whoami) ~/.npm
 ```
 
 ### 네트워크 오류
+
 ```bash
 # 오류: 네트워크 타임아웃
 Error: network timeout
@@ -193,6 +213,7 @@ npm config set registry https://registry.npmjs.org/
 ## 🔄 업데이트 방법
 
 ### Git으로 업데이트
+
 ```bash
 # 최신 코드 가져오기
 git pull origin main
@@ -205,6 +226,7 @@ diff .env.example .env.local
 ```
 
 ### 수동 업데이트
+
 ```bash
 # 새 버전 다운로드
 # 기존 .env.local 백업
@@ -218,11 +240,13 @@ cp .env.local.backup .env.local
 ## 📞 도움이 필요한 경우
 
 ### 문서 참조 순서
+
 1. **[설정 가이드](02-configuration.md)** - 환경 설정 상세 방법
 2. **[기본 사용법](03-basic-usage.md)** - 첫 번째 DB 연결 테스트
 3. **[트러블슈팅](05-troubleshooting.md)** - 일반적인 문제 해결
 
 ### 커뮤니티 지원
+
 - **GitHub Issues**: 버그 리포트 및 기능 요청
 - **Discussions**: 일반적인 질문 및 사용법 문의
 - **Wiki**: 커뮤니티가 작성한 팁과 가이드
