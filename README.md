@@ -51,7 +51,7 @@ cd custom-database-mcp
 npm install
 ```
 
-### 2️⃣ 설정
+### 2️⃣ 데이터베이스 설정
 
 ```bash
 # 환경 설정 파일 생성
@@ -61,15 +61,82 @@ cp .env.example .env.local
 vim .env.local
 ```
 
-### 3️⃣ 실행
+### 3️⃣ 연결 테스트
 
 ```bash
-# 연결 테스트
+# 연결 테스트 (선택적)
 node test-client.js
-
-# 서버 시작
-npm start
 ```
+
+### 4️⃣ Claude Desktop 연결
+
+#### **Step 1: Claude Desktop 설치**
+[Claude Desktop](https://claude.ai/download)을 다운로드하고 설치합니다.
+
+#### **Step 2: MCP 설정 파일 수정**
+
+**macOS**:
+```bash
+# 설정 파일 열기
+vim ~/Library/Application\ Support/Claude/claude_desktop_config.json
+```
+
+**Windows**:
+```bash
+# 설정 파일 경로
+%APPDATA%\Claude\claude_desktop_config.json
+```
+
+#### **Step 3: Database-MCP 서버 등록**
+
+설정 파일에 다음 내용을 추가하세요:
+
+```json
+{
+  "mcpServers": {
+    "database-mcp": {
+      "command": "node",
+      "args": ["/절대/경로/database-mcp/src/index.js"],
+      "env": {
+        "NODE_ENV": "local"
+      }
+    }
+  }
+}
+```
+
+> **💡 중요**: `/절대/경로/database-mcp`를 실제 프로젝트 경로로 변경하세요!
+
+**예시**:
+```json
+{
+  "mcpServers": {
+    "database-mcp": {
+      "command": "node", 
+      "args": ["/Users/username/projects/database-mcp/src/index.js"],
+      "env": {
+        "NODE_ENV": "local"
+      }
+    }
+  }
+}
+```
+
+#### **Step 4: Claude Desktop 재시작**
+
+1. Claude Desktop을 완전히 종료
+2. 다시 시작
+3. 새로운 대화에서 Database-MCP 도구가 나타나는지 확인
+
+#### **Step 5: 연결 확인**
+
+Claude Desktop에서 다음과 같이 테스트해보세요:
+
+```
+Database-MCP 서버의 연결 상태를 확인해줘
+```
+
+정상적으로 연결되면 데이터베이스 목록과 연결 상태가 표시됩니다.
 
 ## ⚙️ 설정 예제
 
@@ -157,6 +224,91 @@ DEFAULT_DATABASE=main_db
   arguments: {}
 }
 ```
+
+## 🔧 트러블슈팅
+
+### Claude Desktop 연결 문제
+
+#### **❌ "Server disconnected" 오류**
+
+**원인**: JSON 파싱 오류 또는 stdout 출력 간섭
+
+**해결책**:
+1. `.env.local`에서 `MCP_DEBUG=false` 확인
+2. Claude Desktop 완전 재시작
+3. 절대 경로가 정확한지 확인
+
+```bash
+# 경로 확인
+pwd
+# 출력 예: /Users/username/projects/database-mcp
+```
+
+#### **❌ "Tool not found" 오류**
+
+**원인**: MCP 서버가 등록되지 않음
+
+**해결책**:
+1. `claude_desktop_config.json` 문법 확인
+2. JSON 형식이 올바른지 검증
+3. Node.js 버전 확인 (18.0.0 이상)
+
+```bash
+node --version  # v18.0.0 이상이어야 함
+```
+
+#### **❌ 데이터베이스 연결 실패**
+
+**원인**: 잘못된 DB 설정 또는 DB 서버 중단
+
+**해결책**:
+1. 데이터베이스 서버 상태 확인
+2. `.env.local` 설정 검증
+3. 방화벽 설정 확인
+
+```bash
+# MySQL 연결 테스트
+mysql -h localhost -P 3306 -u username -p
+
+# PostgreSQL 연결 테스트  
+psql -h localhost -p 5432 -U username -d database
+```
+
+### 일반적인 문제
+
+#### **성능 이슈**
+
+- **커넥션 풀 크기 조정**: 환경변수 `DB_POOL_SIZE` 설정
+- **쿼리 타임아웃**: 환경변수 `DB_TIMEOUT` 설정
+- **결과 제한**: 환경변수 `MAX_ROWS` 설정
+
+#### **보안 경고**
+
+- **프로덕션 접근 차단**: `NODE_ENV=production`에서 자동 차단됨
+- **위험한 쿼리**: DROP, TRUNCATE 등은 자동으로 차단됨
+- **SQL Injection**: Prepared Statement 사용으로 방지
+
+### 디버깅 방법
+
+#### **서버 로그 확인**
+
+```bash
+# MCP 서버 디버그 모드 실행
+MCP_DEBUG=true node src/index.js
+```
+
+#### **연결 상태 확인**
+
+```bash
+# 테스트 클라이언트 실행
+node test-client.js
+```
+
+#### **상세 로그 보기**
+
+Claude Desktop 로그 확인:
+- **macOS**: `~/Library/Logs/Claude/`
+- **Windows**: `%APPDATA%\Claude\logs\`
 
 ## 📚 완전한 문서
 

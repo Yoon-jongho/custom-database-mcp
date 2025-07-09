@@ -1,12 +1,44 @@
-// src/config.js - 다중 DB 지원 버전
+// src/config.js - 다중 DB 지원 버전 (MCP 호환)
 import dotenv from "dotenv";
 import path from "path";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+
+// ES modules에서 __dirname 구하기
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// 프로젝트 루트 경로 (src 폴더의 상위 폴더)
+const PROJECT_ROOT = path.resolve(__dirname, "..");
 
 // 환경 변수로 어떤 설정 파일을 사용할지 결정
 const ENV = process.env.NODE_ENV || "local";
 const envFile = `.env.${ENV}`;
 
-dotenv.config({ path: path.resolve(process.cwd(), envFile) });
+// MCP 서버에서는 디버깅 출력을 환경변수로 제어
+const DEBUG_MODE = process.env.MCP_DEBUG === "true";
+
+// 디버깅 로그 함수 (MCP 호환)
+function debugLog(message) {
+  if (DEBUG_MODE) {
+    // stderr로 출력하여 JSON 파싱 방해하지 않음
+    console.error(`[DEBUG] ${message}`);
+  }
+}
+
+// MCP 호환: dotenv를 silent 모드로 로드 (stdout 출력 방지)
+const envPath = path.resolve(PROJECT_ROOT, envFile);
+try {
+  dotenv.config({ 
+    path: envPath,
+    debug: false,  // 디버그 출력 비활성화
+    override: false  // 기존 환경변수 덮어쓰지 않음
+  });
+  debugLog(`환경 설정 로딩: ${envPath}`);
+} catch (error) {
+  // stderr로 에러 출력
+  console.error(`[ERROR] 환경 설정 로딩 실패: ${error.message}`);
+}
 
 /**
  * 다중 DB 설정 파싱
@@ -64,12 +96,15 @@ function parseDatabases() {
     }
 
   } catch (error) {
-    console.error("❌ DB 설정 파싱 오류:", error.message);
+    // MCP 호환: 에러는 stderr로 출력
+    console.error(`[ERROR] DB 설정 파싱 오류: ${error.message}`);
     throw new Error(`DB 설정 파싱 실패: ${error.message}`);
   }
 
   if (databases.size === 0) {
-    throw new Error("❌ 설정된 데이터베이스가 없습니다. .env 파일을 확인해주세요.");
+    const errorMsg = `설정된 데이터베이스가 없습니다. 프로젝트 루트(${PROJECT_ROOT})에서 .env 파일을 확인해주세요.`;
+    console.error(`[ERROR] ${errorMsg}`);
+    throw new Error(errorMsg);
   }
 
   return databases;
@@ -78,6 +113,9 @@ function parseDatabases() {
 const config = {
   // 현재 환경
   environment: ENV,
+
+  // 프로젝트 루트 경로 (디버깅용)
+  projectRoot: PROJECT_ROOT,
 
   // 다중 DB 설정
   databases: parseDatabases(),
@@ -121,24 +159,30 @@ const config = {
 
 // 프로덕션 환경 차단
 if (ENV === "production") {
-  throw new Error("🚫 프로덕션 DB 접근은 보안상 차단되어 있습니다!");
+  throw new Error("프로덕션 DB 접근은 보안상 차단되어 있습니다!");
 }
 
-// 설정 검증
+// 설정 검증 (MCP 호환)
 function validateConfig() {
   const defaultDb = config.databases.get(config.defaultDatabase);
   if (!defaultDb) {
-    throw new Error(`❌ 기본 DB '${config.defaultDatabase}'가 설정되지 않았습니다.`);
+    const errorMsg = `기본 DB '${config.defaultDatabase}'가 설정되지 않았습니다.`;
+    console.error(`[ERROR] ${errorMsg}`);
+    throw new Error(errorMsg);
   }
 
-  console.log("✅ 설정된 데이터베이스:");
-  config.databases.forEach((dbConfig, name) => {
-    const dockerLabel = dbConfig.isDocker ? "[Docker] " : "";
-    console.log(`   ${dockerLabel}${name}: ${dbConfig.host}:${dbConfig.port}/${dbConfig.database} (${dbConfig.type})`);
-  });
-  
-  console.log(`✅ 기본 DB: ${config.defaultDatabase}`);
-  console.log(`✅ 환경: ${config.environment}`);
+  // 디버그 모드일 때만 상세 정보 출력
+  if (DEBUG_MODE) {
+    debugLog("설정된 데이터베이스:");
+    config.databases.forEach((dbConfig, name) => {
+      const dockerLabel = dbConfig.isDocker ? "[Docker] " : "";
+      debugLog(`  ${dockerLabel}${name}: ${dbConfig.host}:${dbConfig.port}/${dbConfig.database} (${dbConfig.type})`);
+    });
+    
+    debugLog(`기본 DB: ${config.defaultDatabase}`);
+    debugLog(`환경: ${config.environment}`);
+    debugLog(`프로젝트 루트: ${config.projectRoot}`);
+  }
 }
 
 validateConfig();

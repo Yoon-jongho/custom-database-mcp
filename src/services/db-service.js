@@ -14,12 +14,12 @@ class DatabaseService {
   async initialize() {
     if (this.initialized) return;
 
-    console.log("🔄 데이터베이스 커넥션 풀 초기화 중...");
+    console.error("🔄 데이터베이스 커넥션 풀 초기화 중...");
 
     for (const [dbName, dbConfig] of config.databases) {
       try {
         await this.createPool(dbName, dbConfig);
-        console.log(`✅ ${dbName} 커넥션 풀 생성 성공 (${dbConfig.type})`);
+        console.error(`✅ ${dbName} 커넥션 풀 생성 성공 (${dbConfig.type})`);
       } catch (error) {
         console.error(`❌ ${dbName} 커넥션 풀 생성 실패: ${error.message}`);
         // 개별 DB 실패는 전체를 중단시키지 않음
@@ -27,7 +27,7 @@ class DatabaseService {
     }
 
     this.initialized = true;
-    console.log(`✅ 총 ${this.pools.size}개 DB 커넥션 풀 초기화 완료`);
+    console.error(`✅ 총 ${this.pools.size}개 DB 커넥션 풀 초기화 완료`);
   }
 
   /**
@@ -175,7 +175,7 @@ class DatabaseService {
    * 모든 커넥션 풀 종료
    */
   async disconnect() {
-    console.log("🔄 모든 DB 커넥션 풀 종료 중...");
+    console.error("🔄 모든 DB 커넥션 풀 종료 중...");
     
     for (const [dbName, { pool, type }] of this.pools) {
       try {
@@ -184,7 +184,7 @@ class DatabaseService {
         } else if (type === "postgresql") {
           await pool.end();
         }
-        console.log(`✅ ${dbName} 커넥션 풀 종료 완료`);
+        console.error(`✅ ${dbName} 커넥션 풀 종료 완료`);
       } catch (error) {
         console.error(`❌ ${dbName} 커넥션 풀 종료 실패: ${error.message}`);
       }
