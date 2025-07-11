@@ -17,6 +17,7 @@ console.log = () => {};
 // 설정 및 도구 로드 (이 시점에서 stdout 출력 차단)
 const { environmentTools } = await import("./tools/environment-tools.js");
 const { queryTools } = await import("./tools/query-tools.js");
+const { maintenanceTools } = await import("./tools/maintenance-tools.js");
 
 // stdout 복원 (MCP JSON 통신용)
 process.stdout.write = originalWrite;
@@ -35,7 +36,7 @@ const server = new Server(
 );
 
 // 모든 도구 통합
-const allTools = [...environmentTools, ...queryTools];
+const allTools = [...environmentTools, ...queryTools, ...maintenanceTools];
 
 // 도구 목록 제공
 server.setRequestHandler(ListToolsRequestSchema, async () => ({

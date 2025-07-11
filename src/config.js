@@ -137,6 +137,8 @@ const config = {
     maxRows: parseInt(process.env.MAX_ROWS) || 1000,
     enableDelete: process.env.ENABLE_DELETE === "true",
     enableDrop: process.env.ENABLE_DROP === "true",
+    enableMaintenanceOps: process.env.ENABLE_MAINTENANCE_OPS === "true",
+    enableTruncate: process.env.ENABLE_TRUNCATE === "true",
     allowedDbs: process.env.ALLOWED_DBS?.split(",") || [],
   },
 
@@ -144,11 +146,11 @@ const config = {
   restrictions: {
     local: {
       readOnly: false,
-      allowedOperations: ["SELECT", "INSERT", "UPDATE", "DELETE", "SHOW", "DESCRIBE"],
+      allowedOperations: ["SELECT", "INSERT", "UPDATE", "DELETE", "SHOW", "DESCRIBE", "ALTER"],
     },
     test: {
       readOnly: false,
-      allowedOperations: ["SELECT", "INSERT", "UPDATE", "SHOW", "DESCRIBE"], // DELETE 제한
+      allowedOperations: ["SELECT", "INSERT", "UPDATE", "SHOW", "DESCRIBE", "ALTER"], // DELETE 제한
     },
     production: {
       readOnly: true,
